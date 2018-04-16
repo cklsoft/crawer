@@ -30,7 +30,7 @@ def format(url):
 
 
 def analysis(l):
-    pos = l.find('href=', l.find('<a class="img" href="'))
+    pos = l.find('href=', l.find('<a class="img " href="'))
     pos2 = l.find('target', pos + 1)
     link = l[pos + 6:pos2 - 2]
     pos = l.find('data-original="')
@@ -69,8 +69,8 @@ def analysis(l):
 def getList(url):
     url = format(url)
     p = urllib2.urlopen(url)
-    data = p.read()
-    h = re.compile("<li class=\"clear\">.{5,5000}?</li>")
+    data = p.read().replace('\n','')
+    h = re.compile("<li class=\"clear\">.{0,5000}?</li>")
     list = h.findall(data)
     if len(list) <= 0:
         return []
@@ -156,6 +156,9 @@ def render(list):
         max-width: 70%;
         overflow: hidden;
       }
+      .msg{
+        color:red;
+      }
     </style>
     <script src="http://g.alicdn.com/etao/opensearch/0.15.5/scripts/jquery-1.9.1.min.js"></script>
 
@@ -195,8 +198,8 @@ def render(list):
           })
       })
     </script>
-
-    <div class="board"><table><thead><tr>'''
+    <div class="board">'''
+    res+='<div class="msg">更新时间: '+time.strftime('%Y-%m-%d %H:%M:%S')+'</div><table><thead><tr>'
     res += '<th>房源</th>'
     res += '<th>总价(单价)</th>'
     res += '<th>图片</th>'
@@ -248,6 +251,7 @@ def getTargets(fileName):
     return list
 
 def getPicList(url):
+    print url
     p=urllib2.urlopen(url)
     data=p.read()
     r=re.compile(" housePic\"((.|\n)+)?\"left_fix\"")
@@ -283,8 +287,6 @@ if __name__ == '__main__':
                 if len(t) > 0:
                     list.extend(t)
         save(list)
+        print list
         hour=time.localtime().tm_hour
-        if hour >=2 and hour<= 5:
-            time.sleep(60*10)
-        else:
-            time.sleep(60)
+        time.sleep(120)
